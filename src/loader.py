@@ -77,20 +77,7 @@ class SlackDataLoader:
             userIdsByName[user['name']] = user['id']
         return userNamesById, userIdsByName        
 
-
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Export Slack history')
-
-    
-    parser.add_argument('--zip', help="Name of a zip file to import")
-    args = parser.parse_args()
-
-
-
-
-    # combine all json file in all-weeks8-9
+        # combine all json file in all-weeks8-9
 def slack_parser(path_channel):
     """ parse slack data to extract useful informations from the json file
         step of execution
@@ -155,4 +142,16 @@ def slack_parser(path_channel):
     dfall = dfall.reset_index(drop=True)
     
     return dfall
+
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Export Slack history')
+
+    parser.add_argument('--zip', help="Name of a zip file to import")
+    args = parser.parse_args()
+
+
+
 
