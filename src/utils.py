@@ -43,73 +43,47 @@ def get_msgs_df_info(df):
     return msgs_count_dict, replies_count_dict, mentions_count_dict, links_count_dict
 
 
-
 def get_messages_dict(msgs):
     msg_list = {
-            "msg_id":[],
-            "text":[],
-            "attachments":[],
-            "user":[],
-            "mentions":[],
-            "emojis":[],
-            "reactions":[],
-            "replies":[],
-            "replies_to":[],
-            "ts":[],
-            "links":[],
-            "link_count":[]
-            }
-
+        "msg_id": [],
+        "attachments": [],
+        "user": [],
+        "mentions": [],
+        "emojis": [],
+        "reactions": [],
+        "replies": [],
+        "replies_to": [],
+        "ts": [],
+        "links": [],
+        "link_count": []
+    }
 
     for msg in msgs:
         if "subtype" not in msg:
-            try:
-                msg_list["msg_id"].append(msg["client_msg_id"])
-            except:
-                msg_list["msg_id"].append(None)
-            
-            msg_list["text"].append(msg["text"])
+            msg_list["msg_id"].append(msg.get("client_msg_id"))
             msg_list["user"].append(msg["user"])
             msg_list["ts"].append(msg["ts"])
-            
-            if "reactions" in msg:
-                msg_list["reactions"].append(msg["reactions"])
-            else:
-                msg_list["reactions"].append(None)
-
-            if "parent_user_id" in msg:
-                msg_list["replies_to"].append(msg["ts"])
-            else:
-                msg_list["replies_to"].append(None)
-
-            if "thread_ts" in msg and "reply_users" in msg:
-                msg_list["replies"].append(msg["replies"])
-            else:
-                msg_list["replies"].append(None)
-            
+            msg_list["reactions"].append(msg.get("reactions"))
+            msg_list["replies_to"].append(msg.get("parent_user_id"))
+            msg_list["replies"].append(msg.get("replies") if "thread_ts" in msg and "reply_users" in msg else None)
+        
             if "blocks" in msg:
                 emoji_list = []
                 mention_list = []
                 link_count = 0
                 links = []
-                
+
                 for blk in msg["blocks"]:
-                    if "elements" in blk:
-                        for elm in blk["elements"]:
-                            if "elements" in elm:
-                                for elm_ in elm["elements"]:
-                                    
-                                    if "type" in elm_:
-                                        if elm_["type"] == "emoji":
-                                            emoji_list.append(elm_["name"])
-
-                                        if elm_["type"] == "user":
-                                            mention_list.append(elm_["user_id"])
-                                        
-                                        if elm_["type"] == "link":
-                                            link_count += 1
-                                            links.append(elm_["url"])
-
+                    for elm in blk.get("elements", []):
+                        for elm_ in elm.get("elements", []):
+                            if "type" in elm_:
+                                if elm_["type"] == "emoji":
+                                    emoji_list.append(elm_["name"])
+                                elif elm_["type"] == "user":
+                                    mention_list.append(elm_["user_id"])
+                                elif elm_["type"] == "link":
+                                    link_count += 1
+                                    links.append(elm_["url"])
 
                 msg_list["emojis"].append(emoji_list)
                 msg_list["mentions"].append(mention_list)
@@ -120,7 +94,7 @@ def get_messages_dict(msgs):
                 msg_list["mentions"].append(None)
                 msg_list["links"].append(None)
                 msg_list["link_count"].append(0)
-    
+
     return msg_list
 
 def from_msg_get_replies(msg):
